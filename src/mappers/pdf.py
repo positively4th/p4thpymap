@@ -11,7 +11,7 @@ from ..map import map
 from . import rexp
 
 
-def _colWidth2TotWidth(colCount, colWidth, inverse=False):
+def colWidth2TotWidth(colCount, colWidth, inverse=False):
 
     def _totWidth(colWidth):
         lineWidth = (colCount + 1) * (colWidth + 1) - 1
@@ -61,7 +61,7 @@ def format(df: pd.DataFrame, totWidth: int = None, colWidth: int = None):
         totWidth = cols * colWidth if totWidth is None else totWidth
 
     if totWidth is not None:
-        colWidth = _colWidth2TotWidth(
+        colWidth = colWidth2TotWidth(
             cols, totWidth, inverse=True) if colWidth is None else colWidth
 
     res = [
