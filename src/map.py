@@ -30,16 +30,18 @@ def map(isScalar=None, abortTester=None, **_):
 
             if _isScalar(input):
                 return _abortTester(op(input, *args, **kwargs), input)
-
             if isinstance(input, (tuple)):
                 return tuple([do(scalar, *args, **kwargs) for scalar in list(input)])
-            if isinstance(input, (list)):
-                return [do(scalar, *args, **kwargs) for scalar in input]
             if isinstance(input, (dict)):
                 return {key: do(scalar, *args, **kwargs) for key, scalar in input.items()}
             if isinstance(input, (set)):
                 return set([do(scalar, *args, **kwargs) for scalar in input])
-
+            try:
+                return [do(scalar, *args, **kwargs) for scalar in input]
+            except MapAbort as e:
+                raise e
+            except TypeError:
+                pass
             raise MapException(
                 'Neither scalar nor iterable {}'.format(repr(input)))
 
