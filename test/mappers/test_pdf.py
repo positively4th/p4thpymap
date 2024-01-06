@@ -63,9 +63,9 @@ class TestPDF(unittest.TestCase):
         ])
 
         act = pdf.format(df4, colWidth=4)
-        self.assertEquals(exp, act)
+        self.assertEqual(exp, act)
         act = pdf.format(df4, totWidth=(3+1)*(4+1)-1)
-        self.assertEquals(exp, act)
+        self.assertEqual(exp, act)
 
         exp = linesep.join([
             '     row1 r... r...',
@@ -75,10 +75,10 @@ class TestPDF(unittest.TestCase):
         ])
 
         act = pdf.format(df4.transpose(), colWidth=4)
-        self.assertEquals(exp, act)
+        self.assertEqual(exp, act)
 
         act = pdf.format(df4.transpose(), totWidth=(3+1)*(4+1)-1)
-        self.assertEquals(exp, act)
+        self.assertEqual(exp, act)
 
     def test_format5(self):
         df = TestPDF.df5()
@@ -93,9 +93,9 @@ class TestPDF(unittest.TestCase):
         ])
 
         act = pdf.format(df, colWidth=5)
-        self.assertEquals(exp, act)
+        self.assertEqual(exp, act)
         act = pdf.format(df, totWidth=(2+1)*(5+1)-1)
-        self.assertEquals(exp, act)
+        self.assertEqual(exp, act)
 
         self.maxDiff = None
         exp = linesep.join([
@@ -105,9 +105,9 @@ class TestPDF(unittest.TestCase):
         ])
 
         act = pdf.format(df.transpose(), colWidth=15)
-        self.assertEquals(exp, act)
+        self.assertEqual(exp, act)
         act = pdf.format(df.transpose(), totWidth=(5+1)*(15+1)-1)
-        self.assertEquals(exp, act)
+        self.assertEqual(exp, act)
 
     def test_correlation(self):
         df3 = TestPDF.df3()
@@ -144,9 +144,9 @@ class TestPDF(unittest.TestCase):
         pdt.assert_frame_equal(exp, act)
 
     def test_columns(self):
-        self.assertEquals(('a',), tuple(pdf.columns(TestPDF.df2(), '^a$')))
-        self.assertEquals(('b',), tuple(pdf.columns(TestPDF.df2(), '^b$')))
-        self.assertEquals(('a', 'c'), tuple(
+        self.assertEqual(('a',), tuple(pdf.columns(TestPDF.df2(), '^a$')))
+        self.assertEqual(('b',), tuple(pdf.columns(TestPDF.df2(), '^b$')))
+        self.assertEqual(('a', 'c'), tuple(
             pdf.columns(TestPDF.df2(), rexp.any(['^a$', '^c$']))))
 
     def test_keepRows(self):
@@ -164,7 +164,7 @@ class TestPDF(unittest.TestCase):
         ]
         actual = pdf.keepRows(
             [df1, df2], lambda r: r['a'] <= 2 and r['b'] <= -2)
-        self.assertAlmostEquals(2, len(actual))
+        self.assertAlmostEqual(2, len(actual))
         for i in range(len(exp)):
             pdt.assert_frame_equal(exp[i], actual[i])
 
@@ -194,7 +194,7 @@ class TestPDF(unittest.TestCase):
 
         act = pdf.group(df, oddEvenGrouper)
 
-        self.assertEquals(2, len(act))
+        self.assertEqual(2, len(act))
 
         self.assertIn('even', act)
         expEven = pd.DataFrame.from_records([

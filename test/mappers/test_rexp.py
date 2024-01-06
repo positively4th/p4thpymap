@@ -21,7 +21,7 @@ class TestRExp(unittest.TestCase):
         for spec in specs:
             cre = rexp.compile(*spec['args'])
 
-            self.assertEquals(spec['expected'], cre)
+            self.assertEqual(spec['expected'], cre)
 
     def test_exactlify(self):
 
@@ -36,7 +36,7 @@ class TestRExp(unittest.TestCase):
         ]
 
         for spec in specs:
-            self.assertEquals(spec['expected'], rexp.exactlify(
+            self.assertEqual(spec['expected'], rexp.exactlify(
                 spec['pattern']), msg=spec['pattern'])
 
     def test_any(self):
@@ -51,7 +51,7 @@ class TestRExp(unittest.TestCase):
         ]
 
         for spec in specs:
-            self.assertEquals(spec['expected'], rexp.any(
+            self.assertEqual(spec['expected'], rexp.any(
                 spec['pattern']), msg=spec['pattern'])
 
     def test_negate(self):

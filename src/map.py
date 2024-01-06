@@ -1,5 +1,7 @@
 from functools import wraps
 
+from .misc import deferredIsScalar
+from .misc import replaceByIndex
 from .misc import isScalarByOp
 from .misc import MapException
 
@@ -15,7 +17,7 @@ class MapAbort(Exception):
         return self.res
 
 
-def map(isScalar=None, abortTester=None, **_):
+def map(isScalar=None, inputArgNr=0, abortTester=None, instanceArgNr=None, **_):
 
     def defAbortTester(result, input): return result
 
@@ -23,21 +25,22 @@ def map(isScalar=None, abortTester=None, **_):
 
     def isScalarWrapper(op):
 
-        _isScalar = isScalarByOp(op) if isScalar is None else isScalar
+        _isScalar = isScalarByOp(op, inputArgNr) \
+            if isScalar is None else isScalar
 
         @wraps(op)
-        def do(input, *args, **kwargs):
-
-            if _isScalar(input):
-                return _abortTester(op(input, *args, **kwargs), input)
+        def do(*args, **kwargs):
+            input = args[inputArgNr]
+            if _isScalar(input) if callable(_isScalar) else deferredIsScalar(_isScalar, input, args):
+                return _abortTester(op(*args, **kwargs), input)
             if isinstance(input, (tuple)):
-                return tuple([do(scalar, *args, **kwargs) for scalar in list(input)])
+                return tuple([do(*replaceByIndex(scalar, inputArgNr, args), **kwargs) for scalar in list(input)])
             if isinstance(input, (dict)):
-                return {key: do(scalar, *args, **kwargs) for key, scalar in input.items()}
+                return {key: do(*replaceByIndex(scalar, inputArgNr, args), **kwargs) for key, scalar in input.items()}
             if isinstance(input, (set)):
-                return set([do(scalar, *args, **kwargs) for scalar in input])
+                return set([do(*replaceByIndex(scalar, inputArgNr, args), **kwargs) for scalar in input])
             try:
-                return [do(scalar, *args, **kwargs) for scalar in input]
+                return [do(*replaceByIndex(scalar, inputArgNr, args), **kwargs) for scalar in input]
             except MapAbort as e:
                 raise e
             except TypeError:

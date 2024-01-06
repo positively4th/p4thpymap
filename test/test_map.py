@@ -8,8 +8,21 @@ class TestMap(unittest.TestCase):
     def test_map_scalar(self):
 
         @map()
-        def square(val: int):
+        def square0(val: int):
             return val * val
+
+        @map(inputArgNr=1)
+        def square1(_: any, val: int):
+            return val * val
+
+        class Squarer():
+
+            def isScalar(self, input, *args, **kwargs):
+                return isinstance(input, (str, int, float, bool))
+
+            @map(isScalar=(0, 'isScalar'), inputArgNr=2)
+            def square1(self, _: any, val: int):
+                return val * val
 
         specs = [
             {'args': (2,), 'kwargs': {}, 'exp': 4},
@@ -20,9 +33,15 @@ class TestMap(unittest.TestCase):
              'exp': {'two': [4, 4], 'three': {'three2': 9}}},
         ]
 
+        squarer = Squarer()
+
         for spec in specs:
-            act = square(*spec['args'], **spec['kwargs'])
-            self.assertEquals(spec['exp'], act)
+            act = square0(*spec['args'], **spec['kwargs'])
+            self.assertEqual(spec['exp'], act)
+            act = square1('a', *spec['args'], **spec['kwargs'])
+            self.assertEqual(spec['exp'], act)
+            act = squarer.square1('a', *spec['args'], **spec['kwargs'])
+            self.assertEqual(spec['exp'], act)
 
     def test_map_list(self):
 
@@ -47,6 +66,6 @@ class TestMap(unittest.TestCase):
 
         for spec in specs:
             act = squares_explicit(*spec['args'], **spec['kwargs'])
-            self.assertEquals(spec['exp'], act)
+            self.assertEqual(spec['exp'], act)
             act = squares_implicit(*spec['args'], **spec['kwargs'])
-            self.assertEquals(spec['exp'], act)
+            self.assertEqual(spec['exp'], act)

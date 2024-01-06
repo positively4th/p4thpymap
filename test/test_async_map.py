@@ -12,6 +12,20 @@ class TestAsyncMap(unittest.IsolatedAsyncioTestCase):
             await asyncio.sleep(0.1)
             return val * val
 
+        @map(inputArgNr=1)
+        async def square1(_: any, val: int):
+            await asyncio.sleep(0.1)
+            return val * val
+
+        class Squarer():
+            def isScalar(self, input, *args, **kwargs):
+                return isinstance(input, (str, int, float, bool))
+
+            @map(isScalar=(0, 'isScalar'), inputArgNr=2)
+            async def square1(self, _: any, val: int):
+                await asyncio.sleep(0.1)
+                return val * val
+
         specs = [
             {'args': (2,), 'kwargs': {}, 'exp': 4},
             {'args': ([2, 3],), 'kwargs': {}, 'exp': [4, 9]},
@@ -21,9 +35,15 @@ class TestAsyncMap(unittest.IsolatedAsyncioTestCase):
              'exp': {'two': [4, 4], 'three': {'three2': 9}}},
         ]
 
+        squarer = Squarer()
+
         for spec in specs:
             act = await square(*spec['args'], **spec['kwargs'])
-            self.assertEquals(spec['exp'], act)
+            self.assertEqual(spec['exp'], act)
+            act = await square1('a', *spec['args'], **spec['kwargs'])
+            self.assertEqual(spec['exp'], act)
+            act = await squarer.square1('a', *spec['args'], **spec['kwargs'])
+            self.assertEqual(spec['exp'], act)
 
     async def test_map_list(self):
 
@@ -50,6 +70,6 @@ class TestAsyncMap(unittest.IsolatedAsyncioTestCase):
 
         for spec in specs:
             act = await squares_explicit(*spec['args'], **spec['kwargs'])
-            self.assertEquals(spec['exp'], act)
+            self.assertEqual(spec['exp'], act)
             act = await squares_implicit(*spec['args'], **spec['kwargs'])
-            self.assertEquals(spec['exp'], act)
+            self.assertEqual(spec['exp'], act)
